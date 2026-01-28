@@ -1,41 +1,44 @@
 # Contributing to Yolog Skills
 
-Thanks for your interest in contributing to Yolog Skills!
+Thanks for your interest in improving Yolog Skills!
 
-## Adding a New Skill
+## How to Use
 
-1. Create a folder under `skills/` with your skill name
-2. Add a `SKILL.md` file following the [Claude Code Skills format](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/skills)
-3. Update `.claude-plugin/marketplace.json` to include your skill
-4. Submit a pull request
+1. Clone this repo:
+   ```bash
+   git clone https://github.com/yologdev/yo-skills.git
+   ```
 
-### SKILL.md Requirements
+2. Copy the skills to your project:
+   ```bash
+   cp -r yo-skills/skills/yo /path/to/your/project/.claude/skills/
+   ```
 
-```yaml
----
-name: your-skill-name
-description: Brief description of what the skill does and when to use it.
----
+3. Configure the MCP CLI path in `SKILL.md` (see README for details)
 
-# Skill Title
+## Ways to Contribute
 
-Instructions for Claude...
-```
+### Report Issues
 
-## Guidelines
-
-- Keep skills focused and single-purpose
-- Test your skill before submitting
-- Document any prerequisites or configuration needed
-- Follow existing code style
-
-## Reporting Issues
-
-Open an issue on GitHub with:
+Found a bug or something not working? Open an issue with:
 - What you expected to happen
 - What actually happened
 - Steps to reproduce
 - Your Yolog Desktop version
+
+### Improve Existing Skills
+
+1. Fork this repo
+2. Make your changes
+3. Test the skill works correctly
+4. Submit a pull request with a clear description
+
+### Suggest Features
+
+Open an issue describing:
+- What feature you'd like
+- Why it would be useful
+- Any ideas on how to implement it
 
 ## Questions?
 
