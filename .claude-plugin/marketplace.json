@@ -1,0 +1,20 @@
+{
+  "name": "yolog-skills",
+  "displayName": "Yolog Memory Skills",
+  "description": "Recall project memories from Yolog during coding sessions. Search decisions, patterns, bugs, and architecture insights.",
+  "version": "0.1.0",
+  "author": "Yolog",
+  "homepage": "https://yolog.dev",
+  "repository": "https://github.com/yologdev/yo-skills",
+  "skills": [
+    {
+      "name": "yo",
+      "description": "Search and recall project memories from Yolog"
+    }
+  ],
+  "requirements": {
+    "tools": [],
+    "mcpServers": ["yolog-memory"]
+  },
+  "tags": ["memory", "context", "yolog", "productivity"]
+}
