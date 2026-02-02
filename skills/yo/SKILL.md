@@ -32,8 +32,9 @@ MCP_CLI_PATH=/Applications/yolog.app/Contents/MacOS/yolog-mcp-server
 |---------|-------------|
 | `/yo context` | Get session context (current state + memories). See [CONTEXT.md](CONTEXT.md) |
 | `/yo project` | Get project context (shared across all sessions). See [PROJECT.md](PROJECT.md) |
-| `/yo search <query>` | Search memories by keyword or topic. See [SEARCH.md](SEARCH.md) |
-| `/yo recall <query>` | Alias for `/yo search <query>` |
+| `/yo search <query>` | Search memories by keyword, topic, or tag. See [SEARCH.md](SEARCH.md) |
+
+**Search supports tags:** `/yo search tag:bug` or `/yo search #frontend`
 
 ## Instructions
 
@@ -41,7 +42,7 @@ Parse `$ARGUMENTS` to determine the command:
 
 - **If arguments equal `context` or empty**: Follow [CONTEXT.md](CONTEXT.md)
 - **If arguments equal `project`**: Follow [PROJECT.md](PROJECT.md)
-- **If arguments start with `search` or `recall`**: Follow [SEARCH.md](SEARCH.md)
+- **If arguments start with `search`**: Follow [SEARCH.md](SEARCH.md)
 - **If arguments invalid**: Show usage help below
 
 ## Note on Session Context
@@ -61,6 +62,7 @@ The following environment variables are set by SessionStart hook:
 Yolog Memory Commands:
   /yo context              - Get session context (current state + memories)
   /yo project              - Get project context (shared across all sessions)
-  /yo search <query>       - Search memories by keyword
-  /yo recall <query>       - Alias for search
+  /yo search <query>       - Search memories by keyword or topic
+  /yo search tag:<name>    - Filter memories by tag (e.g., tag:bug)
+  /yo search #<name>       - Shorthand for tag filter (e.g., #frontend)
 ```
