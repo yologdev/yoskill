@@ -39,8 +39,15 @@ These skills let you quickly recall this knowledge in Claude Code using simple c
 
 ### Prerequisites
 
-1. [Yolog Desktop](https://yolog.dev) installed with sessions imported
-2. Memory extraction enabled (Settings > AI Features)
+**Option A: Yolog Desktop** (easiest)
+- [Yolog Desktop](https://yolog.dev) installed - Yocore is bundled automatically
+- Memory extraction enabled (Settings > AI Features)
+
+**Option B: Yocore standalone** (for CLI-only users)
+```bash
+npm install -g @yologdev/core
+yocore  # Start the service
+```
 
 ### Option 1: Install via Claude Code (Recommended)
 
@@ -68,14 +75,16 @@ Then run `/yo init` to set up hooks for automatic session tracking.
    cp -r yo-skills/skills/yo/hooks /path/to/your/project/.claude/
    ```
 
-### Configure MCP CLI Path
+### Configure Yocore URL (Optional)
 
-After installation, configure the MCP CLI path:
+By default, the skills connect to `http://localhost:19420`. To use a remote Yocore:
 
-1. Open Yolog Desktop > Settings > Memory & Skills
-2. Copy the "MCP CLI Path"
-3. Open `.claude/skills/yo/SKILL.md`
-4. Replace the path in the Configuration section
+```bash
+# Set environment variable
+export YOCORE_URL="http://your-nas:19420"
+```
+
+Or configure in your shell profile (`~/.zshrc` or `~/.bashrc`).
 
 ### Start Using
 
@@ -105,17 +114,23 @@ Search memories by tags for targeted results:
 
 ## How it Works
 
-The skills invoke the Yolog MCP server CLI to search your local memory database. All data stays on your machine - nothing is sent to external servers.
+The skills invoke Yocore (the Yolog backend service) to search your local memory database. All data stays on your machine - nothing is sent to external servers.
 
 ```
-Claude Code → Skill → MCP CLI → Local SQLite DB → Memories
+Claude Code → Skill → Yocore API → Local SQLite DB → Memories
 ```
 
 ## Requirements
 
-- Yolog Desktop (release build with MCP server)
+- **Yocore** running (bundled in Yolog Desktop, or install standalone)
 - Claude Code
 - Sessions with memory extraction completed
+
+**Note:** If Yocore is not running, you'll see a warning at session start:
+```
+⚠️  Yocore not running. Session archiving, indexing, and memory tools unavailable.
+   Start with: yocore
+```
 
 ## License
 

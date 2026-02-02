@@ -3,6 +3,15 @@
 # Captures Claude Code session_id and makes it available to subsequent commands
 # For compacted sessions: proactively injects session context into Claude's context
 
+# Check if Yocore is running (needed for memory, archiving, indexing)
+YOCORE_URL="${YOCORE_URL:-http://localhost:19420}"
+if ! curl -s --connect-timeout 1 "$YOCORE_URL/health" > /dev/null 2>&1; then
+    echo "⚠️  Yocore not running. Session archiving, indexing, and memory tools unavailable." >&2
+    echo "   Start with: yocore" >&2
+    echo "   Or install: npm install -g @yologdev/core" >&2
+    echo "" >&2
+fi
+
 # Read hook input (JSON from stdin)
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // ""')
