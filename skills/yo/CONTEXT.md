@@ -52,4 +52,5 @@ printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_ge
 - Replace `<CWD>` with the current working directory
 - Replace `<SESSION_ID>` with YOLOG_SESSION_ID from environment
 - Replace `<MCP_CLI_PATH>` with the path from SKILL.md Configuration section
-- Use this at session start or after context compaction to resume work
+- Use this at session start to get context
+- **After compaction:** Context is automatically injected by SessionStart hook (no manual call needed)

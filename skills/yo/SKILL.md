@@ -11,12 +11,14 @@ Access project memories and session context from the Yolog desktop app.
 
 | Trigger | Command |
 |---------|---------|
-| Session start or after compaction | `/yo context` |
+| Session start (fresh) | `/yo context` |
 | User asks "what did we do?" or "summarize" | `/yo context` |
 | User asks about past decisions or patterns | `/yo search <keywords>` |
 | Before implementing a feature | `/yo search <feature topic>` |
 | User asks "how did we do X before?" | `/yo search <X>` |
 | Wrapping up or ending session | `/yo context` to verify captured |
+
+**Note:** After compaction, context is **automatically injected** by the SessionStart hook - no manual `/yo context` needed.
 
 ## Configuration
 

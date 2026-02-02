@@ -91,12 +91,12 @@ This project uses Yolog for persistent memory across sessions.
 
 **At session start:** Use `/yo context` to check for active tasks and decisions.
 
+**After compaction:** Context is automatically injected - no manual call needed.
+
 **Before answering historical questions** like "What did we decide about X?":
 - ALWAYS use `/yo search <keywords>` BEFORE answering
 - Search the project memories, don't rely on your own memory
 - Quote the relevant memory in your response
-
-**After significant progress:** Use `/yo update` to checkpoint work.
 ```
 
 ### Step 6: Display success message
@@ -105,7 +105,7 @@ This project uses Yolog for persistent memory across sessions.
 ✅ Yolog hooks configured successfully!
 
 Hooks installed:
-  - .claude/hooks/session-start.sh (captures session ID)
+  - .claude/hooks/session-start.sh (captures session ID, auto-restores context after compaction)
   - .claude/hooks/pre-compact.sh (saves lifeboat before compaction)
 
 Settings updated:
@@ -117,7 +117,6 @@ CLAUDE.md updated:
 Next steps:
   1. Restart Claude Code to activate hooks
   2. Use /yo context to verify session ID is captured
-  3. Use /yo update to checkpoint your work
 
 MCP Server: [path or "Not found - install Yolog app"]
 ```
