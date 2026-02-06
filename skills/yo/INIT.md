@@ -84,18 +84,28 @@ If this fails, the user needs to start the Yolog desktop app (which launches Yoc
 Append the following to the project's `CLAUDE.md` (create if doesn't exist):
 
 ```markdown
-### Yolog Memory Protocol
+### Yolog Memory Protocol (PROACTIVE USE REQUIRED)
 
-This project uses Yolog for persistent memory across sessions.
+This project uses Yolog for persistent memory across coding sessions. Hooks in `.claude/hooks/` handle session lifecycle automatically.
 
-**At session start:** Use `/yo context` to check for active tasks and decisions.
+**Commands (use proactively — do NOT wait for the user to ask):**
 
-**After compaction:** Context is automatically injected - no manual call needed.
+| Command | When to use |
+|---------|-------------|
+| `/yo context` | At session start. When summarizing work or asked "what did we do?" |
+| `/yo memory-search <query>` | BEFORE implementing features. BEFORE answering "what did we decide about X?" |
+| `/yo memory-search tag:<name>` | Filter by tag: `tag:bug`, `tag:security`, `tag:architecture`, etc. |
+| `/yo project-search <query>` | Find past conversations: "when did we discuss X?", "how did we do X before?" |
+| `/yo project` | Before working in an unfamiliar area of the codebase |
+| `/yo memories` | When user asks about extracted memories from this session |
 
-**Before answering historical questions** like "What did we decide about X?":
-- ALWAYS use `/yo memory-search <keywords>` BEFORE answering
-- Search the project memories, don't rely on your own memory
-- Quote the relevant memory in your response
+**Rules — you MUST follow these:**
+- **ALWAYS** `/yo memory-search` BEFORE answering questions about past decisions, patterns, or conventions — do NOT rely on your own memory
+- **ALWAYS** `/yo memory-search` BEFORE implementing a feature — check if it was discussed or attempted before
+- **ALWAYS** `/yo memory-search` when debugging — past sessions may have solved the same issue
+- After compaction, context is auto-injected by hooks — no manual `/yo context` needed
+- Quote relevant memory IDs (e.g., `[#42]`) when referencing past decisions
+- `/yo update` and `/yo delete` are NEVER proactive — only when user explicitly asks
 ```
 
 ### Step 6: Display success message

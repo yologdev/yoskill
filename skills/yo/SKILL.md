@@ -1,23 +1,29 @@
 ---
 name: yo
-description: "Yolog Memory System - USE THIS PROACTIVELY: (1) at session start, (2) when summarizing work or asked 'what did we do?', (3) before answering questions about past decisions/patterns, (4) when searching for how something was done before. Commands: /yo context, /yo memory-search <query>, /yo project-search <query>"
+description: "Yolog Memory System - USE PROACTIVELY. MUST search before: answering 'what did we decide/do?', implementing features, debugging familiar issues, answering 'why did we...'. Commands: /yo context (session start), /yo memory-search <query> (decisions/patterns), /yo project-search <query> (past conversations)"
 ---
 
 # Yolog Memory System
 
 Access project memories, session context, and raw conversation search from the Yolog desktop app via Yocore HTTP API.
 
-## When to Use (PROACTIVE)
+## When to Use (PROACTIVE — do NOT wait for user to ask)
 
 | Trigger | Command |
 |---------|---------|
 | Session start (fresh) | `/yo context` |
 | User asks "what did we do?" or "summarize" | `/yo context` |
 | User asks about past decisions or patterns | `/yo memory-search <keywords>` |
+| User asks "why did we..." / "what was the reason for..." | `/yo memory-search <topic>` |
+| User says "I don't remember" / "what was..." | `/yo memory-search <topic>` |
 | Before implementing a feature | `/yo memory-search <feature topic>` |
+| User is debugging something | `/yo memory-search <error or topic>` |
 | User asks "how did we do X before?" | `/yo project-search <X>` |
-| User asks "when did we discuss X?" | `/yo project-search <X>` |
+| User asks "when did we discuss X?" / "find the conversation about X" | `/yo project-search <X>` |
+| Before working in unfamiliar area of codebase | `/yo project` |
 | Wrapping up or ending session | `/yo context` to verify captured |
+
+**Key:** If the answer might exist in past sessions, **search first, answer second.**
 
 **Note:** After compaction, context is **automatically injected** by the SessionStart hook - no manual `/yo context` needed.
 
