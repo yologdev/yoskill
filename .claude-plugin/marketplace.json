@@ -1,0 +1,13 @@
+{
+  "name": "yoskill",
+  "owner": {
+    "name": "Yolog"
+  },
+  "plugins": [
+    {
+      "name": "yo",
+      "source": ".",
+      "description": "Persistent memory system for AI coding sessions. Proactively searches past decisions, patterns, and context via Yocore HTTP API."
+    }
+  ]
+}
