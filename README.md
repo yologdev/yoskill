@@ -52,11 +52,13 @@ These skills let you quickly recall this knowledge in Claude Code using simple c
 
 ### Option 1: Plugin Install (Recommended)
 
-```bash
-claude plugin install /path/to/yoskill-repo
+In Claude Code:
+```
+/plugin marketplace add yologdev/yoskill
+/plugin install yo@yoskill
 ```
 
-This auto-registers hooks for session tracking and context restoration. Then run `/yo init` in your project to add memory protocol to CLAUDE.md.
+This auto-registers hooks for session tracking and context restoration. Restart Claude Code after install, then run `/yo init` in your project to add memory protocol to CLAUDE.md.
 
 ### Option 2: Manual Installation
 
