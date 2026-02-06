@@ -79,7 +79,21 @@ This auto-registers hooks for session tracking and context restoration. Restart 
    chmod +x /path/to/your/project/.claude/hooks/*.sh
    ```
 
-4. **Run `/yo init`** to configure CLAUDE.md and permissions
+4. **Configure hooks** in `.claude/settings.local.json`:
+   ```json
+   {
+     "hooks": {
+       "SessionStart": [
+         { "hooks": [{ "type": "command", "command": ".claude/hooks/session-start.sh" }] }
+       ],
+       "PreCompact": [
+         { "hooks": [{ "type": "command", "command": ".claude/hooks/pre-compact.sh" }] }
+       ]
+     }
+   }
+   ```
+
+5. **Run `/yo init`** to configure CLAUDE.md and permissions
 
 ### Verify Yocore is Running
 
