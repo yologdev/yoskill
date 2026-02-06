@@ -51,6 +51,8 @@ if [ "$SOURCE" = "compact" ] && [ -n "$CWD" ]; then
         echo "$CONTEXT"
         echo ""
         echo "---"
+        echo "**Reminders:** Search memories with \`/yo memory-search <topic>\` before answering questions about past decisions. Use \`/yo context\` if you need the full session state."
+        echo ""
         echo "_Context automatically restored by Yolog. Continue where you left off._"
     fi
 fi
