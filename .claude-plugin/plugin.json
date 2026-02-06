@@ -1,0 +1,6 @@
+{
+  "name": "yo",
+  "version": "0.1.0",
+  "description": "Persistent memory system for AI coding sessions. Proactively searches past decisions, patterns, and context via Yocore HTTP API. Auto-restores session state after context compaction.",
+  "author": "Yolog"
+}

@@ -50,14 +50,13 @@ These skills let you quickly recall this knowledge in Claude Code using simple c
 1. [Yolog Desktop](https://yolog.dev) installed with sessions imported
 2. Memory extraction enabled (Settings > AI Features)
 
-### Option 1: Install via Claude Code (Recommended)
+### Option 1: Plugin Install (Recommended)
 
-In Claude Code, simply say:
-```
-install skill https://github.com/yologdev/yoskill
+```bash
+claude plugin install /path/to/yoskill-repo
 ```
 
-Then run `/yo init` to set up hooks for automatic session tracking.
+This auto-registers hooks for session tracking and context restoration. Then run `/yo init` in your project to add memory protocol to CLAUDE.md.
 
 ### Option 2: Manual Installation
 
@@ -66,15 +65,19 @@ Then run `/yo init` to set up hooks for automatic session tracking.
    git clone https://github.com/yologdev/yoskill.git
    ```
 
-2. **Copy to your project**
+2. **Copy skill to your project**
    ```bash
    cp -r yoskill/skills/yo /path/to/your/project/.claude/skills/
    ```
 
-3. **Set up hooks** (optional but recommended)
+3. **Copy hooks** (for session tracking and auto-restoration)
    ```bash
-   cp -r yoskill/skills/yo/hooks /path/to/your/project/.claude/
+   mkdir -p /path/to/your/project/.claude/hooks
+   cp yoskill/hooks/session-start.sh yoskill/hooks/pre-compact.sh /path/to/your/project/.claude/hooks/
+   chmod +x /path/to/your/project/.claude/hooks/*.sh
    ```
+
+4. **Run `/yo init`** to configure CLAUDE.md and permissions
 
 ### Verify Yocore is Running
 
