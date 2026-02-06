@@ -12,37 +12,43 @@ Get project-level context shared across all sessions. Includes key decisions, pa
 
 1. Call the Yocore HTTP API with current working directory:
 ```bash
-curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/project?project_path=<CWD>"
+curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/project?project_path=<CWD>" \
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"}
 ```
 
-2. Parse the JSON response. The response contains structured data and a `formatted_text` field.
+2. Parse the JSON response and display using **structured fields** (not `formatted_text`):
 
-3. Display the project context using the response data:
 ```
 ## Project Context: [project_name]
 
 ### Key Decisions
-- [from decisions array - architectural choices, technology selections]
+- [#id] **Title**: Content
+  (from decisions array — include memory ID)
 
 ### Facts & Discoveries
-- [from facts array - learned information, how things work]
+- [#id] **Title**: Content
+  (from facts array)
 
 ### Preferences
-- [from preferences array - code style, conventions]
+- [#id] **Title**: Content
+  (from preferences array)
 
 ### Context
-- [from context array - background info, domain knowledge]
+- [#id] **Title**: Content
+  (from context array)
 
 ### Tasks
-- [from tasks array - action items, work items]
+- [#id] **Title**: Content
+  (from tasks array)
 
 **Total memories:** [total_memories]
 ```
 
-4. Summarize key conventions and decisions to follow
+3. Summarize key conventions and decisions to follow
 
 ## Notes
 
 - Replace `<CWD>` with the current working directory
+- **Always include memory IDs** (e.g., `[#42]`) — enables `/yo update` and `/yo delete`
 - This returns project-wide knowledge, not session-specific state
 - Use `/yo context` for session-specific state (active task, recent decisions)

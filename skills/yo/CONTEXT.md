@@ -22,36 +22,39 @@ or ensure the SessionStart hook is configured.
 ```bash
 curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/session" \
   -H "Content-Type: application/json" \
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"} \
   -d '{"session_id":"<SESSION_ID>","project_path":"<CWD>"}'
 ```
 
-4. Parse the JSON response. The response contains structured data and a `formatted_text` field.
+4. Parse the JSON response and display using **structured fields** (not `formatted_text`):
 
-5. Display the session context using the response data:
 ```
 ## Session Context
 
 ### Current State
 - **Active Task:** [from session.active_task]
-- **Resume Context:** [from session.resume_context, if available]
+- **Resume Context:** [from session.resume_context, if available — this is the lifeboat data]
 - **Recent Decisions:** [from session.recent_decisions]
 - **Open Questions:** [from session.open_questions]
 
 ### Persistent Knowledge (High Importance)
-- [from persistent_memories array]
+- [#id] [Type] **Title**: Content
+  (from persistent_memories array — include memory ID)
 
 ### This Session's Memories
-- [from session_memories array]
+- [#id] [Type] **Title**: Content
+  (from session_memories array — include memory ID)
 
 ### Recent Memories (Last 3 Sessions)
-- [from recent_memories array]
+- [#id] [Type] **Title**: Content
+  (from recent_memories array — include memory ID)
 ```
 
-6. Summarize key points to keep in mind while working
+5. Summarize key points to keep in mind while working
 
 ## Notes
 
 - Replace `<CWD>` with the current working directory
 - Replace `<SESSION_ID>` with YOLOG_SESSION_ID from environment
-- Use this at session start to get context
+- **Always include memory IDs** (e.g., `[#42]`) — enables `/yo update` and `/yo delete`
 - **After compaction:** Context is automatically injected by SessionStart hook (no manual call needed)

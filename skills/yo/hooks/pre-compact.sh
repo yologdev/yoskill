@@ -28,9 +28,16 @@ if ! curl -s --max-time 2 "${YOCORE_URL}/health" >/dev/null 2>&1; then
     exit 0
 fi
 
+# Build auth header if API key is set
+AUTH_HEADER=""
+if [ -n "${YOCORE_API_KEY:-}" ]; then
+    AUTH_HEADER="-H \"Authorization: Bearer ${YOCORE_API_KEY}\""
+fi
+
 # Save lifeboat via HTTP API
-curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/lifeboat" \
+eval curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/lifeboat" \
   -H "Content-Type: application/json" \
+  $AUTH_HEADER \
   -d "{\"session_id\":\"$SESSION_ID\"}" >/dev/null 2>&1
 echo "[yolog] Lifeboat saved successfully" >&2
 

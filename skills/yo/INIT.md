@@ -93,7 +93,7 @@ This project uses Yolog for persistent memory across sessions.
 **After compaction:** Context is automatically injected - no manual call needed.
 
 **Before answering historical questions** like "What did we decide about X?":
-- ALWAYS use `/yo search <keywords>` BEFORE answering
+- ALWAYS use `/yo memory-search <keywords>` BEFORE answering
 - Search the project memories, don't rely on your own memory
 - Quote the relevant memory in your response
 ```

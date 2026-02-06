@@ -15,21 +15,29 @@ These skills let you quickly recall this knowledge in Claude Code using simple c
 
 ## Available Skills
 
-### `/yo` - Memory Recall
+### `/yo` - Memory Recall & Management
 
 | Command | Description |
 |---------|-------------|
 | `/yo context` | Get session context + memories (use at session start) |
 | `/yo project` | Get project-wide context (shared across all sessions) |
-| `/yo search <query>` | Search memories by keyword or topic |
-| `/yo search tag:<name>` | Filter memories by tag (e.g., `tag:bug`, `tag:security`) |
-| `/yo search tag:<name> <query>` | Combined tag + keyword search |
+| `/yo memory-search <query>` | Search extracted memories (hybrid FTS + vector) |
+| `/yo memory-search tag:<name>` | Filter memories by tag (e.g., `tag:bug`, `tag:security`) |
+| `/yo project-search <query>` | Search raw session messages (BM25 FTS) |
+| `/yo memories` | List memories from current session (with IDs) |
+| `/yo update <id> state=<value>` | Update a memory's state or confidence |
+| `/yo delete <id>` | Remove a memory (soft delete) |
+| `/yo tags` | List available memory tags |
+| `/yo status` | Check Yocore connection status |
+| `/yo init` | Set up hooks and configuration |
 
 **Examples:**
 ```
 /yo context
-/yo search error handling
-/yo search tag:bug authentication
+/yo memory-search error handling
+/yo memory-search tag:bug authentication
+/yo project-search "config migration"
+/yo memories
 /yo project
 ```
 
@@ -82,8 +90,9 @@ If this fails, start the Yolog desktop app (which launches Yocore automatically)
 
 ```
 /yo context
-/yo search database migrations
-/yo search tag:bug
+/yo memory-search database migrations
+/yo memory-search tag:bug
+/yo project-search "how we implemented auth"
 ```
 
 ## Features

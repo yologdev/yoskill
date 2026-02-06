@@ -32,9 +32,16 @@ if [ "$SOURCE" = "compact" ] && [ -n "$CWD" ]; then
         exit 0
     fi
 
+    # Build auth header if API key is set
+    AUTH_HEADER=""
+    if [ -n "${YOCORE_API_KEY:-}" ]; then
+        AUTH_HEADER="-H \"Authorization: Bearer ${YOCORE_API_KEY}\""
+    fi
+
     # Get session context via HTTP API
-    RESPONSE=$(curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/session" \
+    RESPONSE=$(eval curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/session" \
       -H "Content-Type: application/json" \
+      $AUTH_HEADER \
       -d "{\"session_id\":\"$SESSION_ID\",\"project_path\":\"$CWD\"}" 2>/dev/null)
     CONTEXT=$(echo "$RESPONSE" | jq -r '.formatted_text // empty' 2>/dev/null)
 

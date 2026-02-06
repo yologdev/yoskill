@@ -1,74 +1,77 @@
-# /yo search
+# /yo memory-search
 
-Search memories by keyword, topic, or tag.
+Search extracted memories by keyword, topic, or tag. Uses hybrid FTS5 + vector search.
 
 ## Usage
 
 ```
-/yo search <query>                    # Keyword/semantic search
-/yo search tag:<tagname>              # Filter by tag only
-/yo search tag:<tagname> <query>      # Combined: tag filter + keyword search
+/yo memory-search <query>                    # Keyword/semantic search
+/yo memory-search tag:<tagname>              # Filter by tag only
+/yo memory-search tag:<tagname> <query>      # Combined: tag filter + keyword search
 ```
 
 ## Examples
 
 ```
-/yo search error handling
-/yo search authentication flow
-/yo search tag:bug
-/yo search tag:bug timezone           # Bugs related to timezone
-/yo search tag:security api           # Security issues about API
+/yo memory-search error handling
+/yo memory-search authentication flow
+/yo memory-search tag:bug
+/yo memory-search tag:bug timezone
+/yo memory-search tag:security api
 ```
 
 ## Instructions
 
-1. Extract the search query (everything after "search ")
+1. Extract the search query (everything after "memory-search ")
 
 2. Parse for tag and keyword:
-   - If starts with `tag:<name>` → extract tag name, rest is keyword query
-   - Otherwise → keyword-only search
+   - If starts with `tag:<name>` -> extract tag name, rest is keyword query
+   - Otherwise -> keyword-only search
 
-   Examples:
-   - `tag:bug` → tags=["bug"], query=none
-   - `tag:frontend api` → tags=["frontend"], query="api"
-   - `error handling` → tags=none, query="error handling"
+3. Resolve the project ID:
+```bash
+PROJECT=$(curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/projects/resolve?path=<CWD>" \
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"})
+PROJECT_ID=$(echo "$PROJECT" | jq -r '.id')
+```
 
-3. Call the Yocore HTTP API with the appropriate parameters:
+4. Call the Yocore HTTP API:
 ```bash
 # Keyword-only search
-curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/memories/search" \
   -H "Content-Type: application/json" \
-  -d '{"query":"<QUERY>","project_path":"<CWD>","limit":10}'
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"} \
+  -d '{"query":"<QUERY>","project_id":"<PROJECT_ID>","limit":10}'
 
-# Tag-only filter
-curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
-  -H "Content-Type: application/json" \
-  -d '{"tags":["<TAG>"],"project_path":"<CWD>","limit":10}'
+# Tag-only filter (use browse endpoint)
+curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/memories?project_id=<PROJECT_ID>&tags=<TAG>&limit=10" \
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"}
 
 # Tag + keyword combined
-curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/memories/search" \
   -H "Content-Type: application/json" \
-  -d '{"query":"<QUERY>","tags":["<TAG>"],"project_path":"<CWD>","limit":10}'
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"} \
+  -d '{"query":"<QUERY>","project_id":"<PROJECT_ID>","tags":["<TAG>"],"limit":10}'
 ```
 
-4. Parse the JSON response
+5. Parse the JSON response and display:
 
-5. Display memories:
 ```
-## Search Results for "<query>"
+## Memory Search Results for "<query>"
 
-1. [Type] **Title** (confidence%)
+1. [#id] [Type] **Title** (confidence%)
    Content summary
    Tags: tag1, tag2
 
-2. ...
+2. [#id] [Type] **Title** (confidence%)
+   Content summary
 ```
 
 6. Summarize key findings at the end
 
 ## Notes
 
-- Replace `<CWD>` with the current working directory
-- Replace `<QUERY>` or `<TAG>` with the extracted value
+- **Always include memory IDs** (e.g., `[#42]`) — enables `/yo update` and `/yo delete`
 - Keyword search uses hybrid (keyword + semantic) for best relevance
 - Tag search filters by exact tag match (AND logic when multiple tags)
+- For searching raw session messages (conversations), use `/yo project-search` instead

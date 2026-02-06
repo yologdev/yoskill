@@ -1,11 +1,11 @@
 ---
 name: yo
-description: "Yolog Memory System - USE THIS PROACTIVELY: (1) at session start, (2) when summarizing work or asked 'what did we do?', (3) before answering questions about past decisions/patterns, (4) when searching for how something was done before. Commands: /yo context, /yo search <query>"
+description: "Yolog Memory System - USE THIS PROACTIVELY: (1) at session start, (2) when summarizing work or asked 'what did we do?', (3) before answering questions about past decisions/patterns, (4) when searching for how something was done before. Commands: /yo context, /yo memory-search <query>, /yo project-search <query>"
 ---
 
 # Yolog Memory System
 
-Access project memories and session context from the Yolog desktop app.
+Access project memories, session context, and raw conversation search from the Yolog desktop app via Yocore HTTP API.
 
 ## When to Use (PROACTIVE)
 
@@ -13,23 +13,50 @@ Access project memories and session context from the Yolog desktop app.
 |---------|---------|
 | Session start (fresh) | `/yo context` |
 | User asks "what did we do?" or "summarize" | `/yo context` |
-| User asks about past decisions or patterns | `/yo search <keywords>` |
-| Before implementing a feature | `/yo search <feature topic>` |
-| User asks "how did we do X before?" | `/yo search <X>` |
+| User asks about past decisions or patterns | `/yo memory-search <keywords>` |
+| Before implementing a feature | `/yo memory-search <feature topic>` |
+| User asks "how did we do X before?" | `/yo project-search <X>` |
+| User asks "when did we discuss X?" | `/yo project-search <X>` |
 | Wrapping up or ending session | `/yo context` to verify captured |
 
 **Note:** After compaction, context is **automatically injected** by the SessionStart hook - no manual `/yo context` needed.
 
 ## Configuration
 
-Yocore HTTP API URL (Yocore runs as a local HTTP server):
+Yocore HTTP API URL (defaults to local):
 
 ```
 YOCORE_URL=http://127.0.0.1:19420
 ```
 
-If the environment variable `YOCORE_URL` is set, use that value.
-Otherwise, default to `http://127.0.0.1:19420`.
+For remote Yocore, also set the API key:
+
+```
+YOCORE_API_KEY=your-api-key
+```
+
+## Authentication
+
+If `YOCORE_API_KEY` is set, include it as a header in ALL API requests:
+
+```
+-H "Authorization: Bearer ${YOCORE_API_KEY}"
+```
+
+If not set, omit the header (local Yocore does not require auth).
+
+## Project ID Resolution
+
+Some commands need the project UUID. Resolve it from the current working directory:
+
+```bash
+curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/projects/resolve?path=<CWD>" \
+  ${YOCORE_API_KEY:+-H "Authorization: Bearer ${YOCORE_API_KEY}"}
+```
+
+Returns `{ "id": "uuid", "name": "project-name", "folder_path": "..." }` or 404.
+
+Use the `id` field as `<PROJECT_ID>` in subsequent API calls.
 
 ## Commands
 
@@ -37,9 +64,14 @@ Otherwise, default to `http://127.0.0.1:19420`.
 |---------|-------------|
 | `/yo context` | Get session context (current state + memories). See [CONTEXT.md](CONTEXT.md) |
 | `/yo project` | Get project context (shared across all sessions). See [PROJECT.md](PROJECT.md) |
-| `/yo search <query>` | Search memories by keyword, topic, or tag. See [SEARCH.md](SEARCH.md) |
-
-**Search supports tags:** `/yo search tag:bug` or `/yo search tag:bug timezone`
+| `/yo memory-search <query>` | Search extracted memories (hybrid FTS+vector). See [SEARCH.md](SEARCH.md) |
+| `/yo project-search <query>` | Search raw session messages (BM25 FTS). See [PROJECT-SEARCH.md](PROJECT-SEARCH.md) |
+| `/yo memories` | List memories from current session with IDs. See [MEMORIES.md](MEMORIES.md) |
+| `/yo update <id> <field=value>` | Update a memory's state or confidence. See [UPDATE.md](UPDATE.md) |
+| `/yo delete <id>` | Remove a memory (soft delete). See [DELETE.md](DELETE.md) |
+| `/yo tags` | List available memory tags. See [TAGS.md](TAGS.md) |
+| `/yo status` | Check if Yocore is running. See [STATUS.md](STATUS.md) |
+| `/yo init` | Set up hooks and configuration. See [INIT.md](INIT.md) |
 
 ## Instructions
 
@@ -47,27 +79,36 @@ Parse `$ARGUMENTS` to determine the command:
 
 - **If arguments equal `context` or empty**: Follow [CONTEXT.md](CONTEXT.md)
 - **If arguments equal `project`**: Follow [PROJECT.md](PROJECT.md)
-- **If arguments start with `search`**: Follow [SEARCH.md](SEARCH.md)
+- **If arguments start with `memory-search`**: Follow [SEARCH.md](SEARCH.md)
+- **If arguments start with `project-search`**: Follow [PROJECT-SEARCH.md](PROJECT-SEARCH.md)
+- **If arguments equal `memories`**: Follow [MEMORIES.md](MEMORIES.md)
+- **If arguments start with `update`**: Follow [UPDATE.md](UPDATE.md)
+- **If arguments start with `delete`**: Follow [DELETE.md](DELETE.md)
+- **If arguments equal `tags`**: Follow [TAGS.md](TAGS.md)
+- **If arguments equal `status`**: Follow [STATUS.md](STATUS.md)
+- **If arguments equal `init`**: Follow [INIT.md](INIT.md)
 - **If arguments invalid**: Show usage help below
-
-## Note on Session Context
-
-Session context (active task, decisions, questions) is **automatically populated** by Yolog during memory extraction. No manual updates needed.
 
 ## Environment Variables
 
-The following environment variables are set by SessionStart hook:
+Set by SessionStart hook:
 
-- `YOLOG_SESSION_ID`: Current Claude Code session ID (required for context)
+- `YOLOG_SESSION_ID`: Current Claude Code session ID (required for context/memories)
 - `YOLOG_SESSION_SOURCE`: How session started (startup, resume, compact)
 
 ## Usage Help
 
 ```
 Yolog Memory Commands:
-  /yo context                  - Get session context (current state + memories)
-  /yo project                  - Get project context (shared across all sessions)
-  /yo search <query>           - Search memories by keyword or topic
-  /yo search tag:<name>        - Filter memories by tag (e.g., tag:bug)
-  /yo search tag:<name> <query> - Combined tag + keyword (e.g., tag:bug timezone)
+  /yo context                       - Get session context (current state + memories)
+  /yo project                       - Get project context (shared across all sessions)
+  /yo memory-search <query>         - Search extracted memories by keyword or topic
+  /yo memory-search tag:<name>      - Filter memories by tag (e.g., tag:bug)
+  /yo project-search <query>        - Search raw session messages (conversations)
+  /yo memories                      - List memories from current session (with IDs)
+  /yo update <id> state=<value>     - Update memory state (new/low/high)
+  /yo delete <id>                   - Remove a memory (soft delete)
+  /yo tags                          - List available memory tags
+  /yo status                        - Check Yocore connection status
+  /yo init                          - Set up hooks and configuration
 ```
