@@ -10,30 +10,33 @@ Get project-level context shared across all sessions. Includes key decisions, pa
 
 ## Instructions
 
-1. Call `yolog_get_project_context` with current working directory:
+1. Call the Yocore HTTP API with current working directory:
 ```bash
-printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_get_project_context","arguments":{"project_path":"<CWD>"}}}' | <MCP_CLI_PATH>
+curl -s "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/project?project_path=<CWD>"
 ```
 
-2. Parse the JSON response
+2. Parse the JSON response. The response contains structured data and a `formatted_text` field.
 
-3. Display the project context:
+3. Display the project context using the response data:
 ```
 ## Project Context: [project_name]
 
 ### Key Decisions
-- [decision memories - architectural choices, technology selections]
+- [from decisions array - architectural choices, technology selections]
 
-### Established Patterns
-- [pattern memories - code conventions, naming rules]
+### Facts & Discoveries
+- [from facts array - learned information, how things work]
 
-### Architecture
-- [architecture memories - system structure, module relationships]
+### Preferences
+- [from preferences array - code style, conventions]
 
-### Known Bugs & Fixes
-- [bug memories - issues found and how they were resolved]
+### Context
+- [from context array - background info, domain knowledge]
 
-**Total memories:** [count]
+### Tasks
+- [from tasks array - action items, work items]
+
+**Total memories:** [total_memories]
 ```
 
 4. Summarize key conventions and decisions to follow
@@ -41,6 +44,5 @@ printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_ge
 ## Notes
 
 - Replace `<CWD>` with the current working directory
-- Replace `<MCP_CLI_PATH>` with the path from SKILL.md Configuration section
 - This returns project-wide knowledge, not session-specific state
 - Use `/yo context` for session-specific state (active task, recent decisions)

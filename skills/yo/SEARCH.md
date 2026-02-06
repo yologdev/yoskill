@@ -29,27 +29,31 @@ Search memories by keyword, topic, or tag.
    - Otherwise → keyword-only search
 
    Examples:
-   - `tag:bug` → tag="bug", query=none
-   - `tag:frontend api` → tag="frontend", query="api"
-   - `error handling` → tag=none, query="error handling"
+   - `tag:bug` → tags=["bug"], query=none
+   - `tag:frontend api` → tags=["frontend"], query="api"
+   - `error handling` → tags=none, query="error handling"
 
-3. **Tag filter (with or without query)** - Call `yolog_get_memories_by_tag`:
+3. Call the Yocore HTTP API with the appropriate parameters:
 ```bash
-# Tag only
-printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_get_memories_by_tag","arguments":{"tag":"<TAG>","project_path":"<CWD>","limit":10}}}' | <MCP_CLI_PATH>
+# Keyword-only search
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"<QUERY>","project_path":"<CWD>","limit":10}'
 
-# Tag + keyword
-printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_get_memories_by_tag","arguments":{"tag":"<TAG>","query":"<QUERY>","project_path":"<CWD>","limit":10}}}' | <MCP_CLI_PATH>
+# Tag-only filter
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
+  -H "Content-Type: application/json" \
+  -d '{"tags":["<TAG>"],"project_path":"<CWD>","limit":10}'
+
+# Tag + keyword combined
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/search" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"<QUERY>","tags":["<TAG>"],"project_path":"<CWD>","limit":10}'
 ```
 
-4. **Keyword-only search** - Call `yolog_search_memories`:
-```bash
-printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_search_memories","arguments":{"query":"<QUERY>","project_path":"<CWD>","limit":10}}}' | <MCP_CLI_PATH>
-```
+4. Parse the JSON response
 
-5. Parse the JSON response
-
-6. Display memories:
+5. Display memories:
 ```
 ## Search Results for "<query>"
 
@@ -60,12 +64,11 @@ printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_se
 2. ...
 ```
 
-7. Summarize key findings at the end
+6. Summarize key findings at the end
 
 ## Notes
 
 - Replace `<CWD>` with the current working directory
 - Replace `<QUERY>` or `<TAG>` with the extracted value
-- Replace `<MCP_CLI_PATH>` with the path from SKILL.md Configuration section
 - Keyword search uses hybrid (keyword + semantic) for best relevance
-- Tag search filters by exact tag match, then optionally by keyword in title/content
+- Tag search filters by exact tag match (AND logic when multiple tags)

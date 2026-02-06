@@ -20,32 +20,18 @@ fi
 
 echo "[yolog] Saving lifeboat for session $SESSION_ID before compaction..." >&2
 
-# Call yolog MCP server to save lifeboat if available
-# The MCP server binary path - check common locations
-MCP_SERVER_PATHS=(
-    "/Applications/yolog.app/Contents/MacOS/yolog-mcp-server"
-    "$HOME/.local/bin/yolog-mcp-server"
-    "$(dirname "$0")/../../mcp-server/target/release/yolog-mcp-server"
-)
+YOCORE_URL="${YOCORE_URL:-http://127.0.0.1:19420}"
 
-MCP_SERVER=""
-for path in "${MCP_SERVER_PATHS[@]}"; do
-    if [ -x "$path" ]; then
-        MCP_SERVER="$path"
-        break
-    fi
-done
-
-if [ -n "$MCP_SERVER" ]; then
-    # Send save_lifeboat request via MCP protocol
-    REQUEST=$(cat <<EOF
-{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_save_lifeboat","arguments":{"session_id":"$SESSION_ID"}}}
-EOF
-)
-    echo "$REQUEST" | "$MCP_SERVER" 2>/dev/null
-    echo "[yolog] Lifeboat saved successfully" >&2
-else
-    echo "[yolog] Warning: yolog-mcp-server not found, skipping lifeboat save" >&2
+# Check if Yocore is reachable
+if ! curl -s --max-time 2 "${YOCORE_URL}/health" >/dev/null 2>&1; then
+    echo "[yolog] Warning: Yocore not reachable at ${YOCORE_URL}, skipping lifeboat save" >&2
+    exit 0
 fi
+
+# Save lifeboat via HTTP API
+curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/lifeboat" \
+  -H "Content-Type: application/json" \
+  -d "{\"session_id\":\"$SESSION_ID\"}" >/dev/null 2>&1
+echo "[yolog] Lifeboat saved successfully" >&2
 
 exit 0

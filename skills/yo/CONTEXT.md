@@ -18,31 +18,33 @@ Session ID not available. Use `/yo project` for project-wide context,
 or ensure the SessionStart hook is configured.
 ```
 
-3. If `YOLOG_SESSION_ID` is set, call `yolog_get_session_context`:
+3. If `YOLOG_SESSION_ID` is set, call the Yocore HTTP API:
 ```bash
-printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_get_session_context","arguments":{"session_id":"<SESSION_ID>","project_path":"<CWD>"}}}' | <MCP_CLI_PATH>
+curl -s -X POST "${YOCORE_URL:-http://127.0.0.1:19420}/api/context/session" \
+  -H "Content-Type: application/json" \
+  -d '{"session_id":"<SESSION_ID>","project_path":"<CWD>"}'
 ```
 
-4. Parse the JSON response
+4. Parse the JSON response. The response contains structured data and a `formatted_text` field.
 
-5. Display the session context:
+5. Display the session context using the response data:
 ```
 ## Session Context
 
 ### Current State
-- **Active Task:** [task description]
-- **Resume Context:** [if available, from last compaction]
-- **Recent Decisions:** [list]
-- **Open Questions:** [list]
+- **Active Task:** [from session.active_task]
+- **Resume Context:** [from session.resume_context, if available]
+- **Recent Decisions:** [from session.recent_decisions]
+- **Open Questions:** [from session.open_questions]
 
 ### Persistent Knowledge (High Importance)
-- [high-state memories from project]
+- [from persistent_memories array]
 
 ### This Session's Memories
-- [memories extracted this session]
+- [from session_memories array]
 
 ### Recent Memories (Last 3 Sessions)
-- [memories from recent other sessions]
+- [from recent_memories array]
 ```
 
 6. Summarize key points to keep in mind while working
@@ -51,6 +53,5 @@ printf '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_ge
 
 - Replace `<CWD>` with the current working directory
 - Replace `<SESSION_ID>` with YOLOG_SESSION_ID from environment
-- Replace `<MCP_CLI_PATH>` with the path from SKILL.md Configuration section
 - Use this at session start to get context
 - **After compaction:** Context is automatically injected by SessionStart hook (no manual call needed)

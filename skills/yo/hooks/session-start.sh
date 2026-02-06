@@ -24,38 +24,27 @@ fi
 
 # For compacted sessions: proactively inject session context
 # stdout from SessionStart hooks is automatically added to Claude's context
-if [ "$SOURCE" = "compact" ]; then
-    # Find MCP server binary
-    MCP_SERVER_PATHS=(
-        "/Applications/yolog.app/Contents/MacOS/yolog-mcp-server"
-        "$HOME/.local/bin/yolog-mcp-server"
-    )
+if [ "$SOURCE" = "compact" ] && [ -n "$CWD" ]; then
+    YOCORE_URL="${YOCORE_URL:-http://127.0.0.1:19420}"
 
-    MCP_SERVER=""
-    for path in "${MCP_SERVER_PATHS[@]}"; do
-        if [ -x "$path" ]; then
-            MCP_SERVER="$path"
-            break
-        fi
-    done
+    # Check if Yocore is reachable
+    if ! curl -s --max-time 2 "${YOCORE_URL}/health" >/dev/null 2>&1; then
+        exit 0
+    fi
 
-    if [ -n "$MCP_SERVER" ] && [ -n "$CWD" ]; then
-        # Get session context and output to stdout (injected into Claude's context)
-        REQUEST=$(cat <<EOF
-{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"yolog_get_session_context","arguments":{"session_id":"$SESSION_ID","project_path":"$CWD"}}}
-EOF
-)
-        RESPONSE=$(echo "$REQUEST" | "$MCP_SERVER" 2>/dev/null)
-        CONTEXT=$(echo "$RESPONSE" | jq -r '.result.content[0].text // empty' 2>/dev/null)
+    # Get session context via HTTP API
+    RESPONSE=$(curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/session" \
+      -H "Content-Type: application/json" \
+      -d "{\"session_id\":\"$SESSION_ID\",\"project_path\":\"$CWD\"}" 2>/dev/null)
+    CONTEXT=$(echo "$RESPONSE" | jq -r '.formatted_text // empty' 2>/dev/null)
 
-        if [ -n "$CONTEXT" ]; then
-            echo "## Yolog: Session Restored After Compaction"
-            echo ""
-            echo "$CONTEXT"
-            echo ""
-            echo "---"
-            echo "_Context automatically restored by Yolog. Continue where you left off._"
-        fi
+    if [ -n "$CONTEXT" ]; then
+        echo "## Yolog: Session Restored After Compaction"
+        echo ""
+        echo "$CONTEXT"
+        echo ""
+        echo "---"
+        echo "_Context automatically restored by Yolog. Continue where you left off._"
     fi
 fi
 

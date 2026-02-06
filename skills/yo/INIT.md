@@ -13,7 +13,7 @@ Set up Yolog hooks and configuration for the current project.
 1. Creates `.claude/hooks/` directory if it doesn't exist
 2. Copies `session-start.sh` and `pre-compact.sh` hooks
 3. Configures hooks in `.claude/settings.local.json`
-4. Verifies MCP server is accessible
+4. Verifies Yocore HTTP API is accessible
 
 ## Instructions
 
@@ -69,16 +69,15 @@ Read `.claude/settings.local.json` if it exists, then merge the hooks configurat
 
 If the file already has a `hooks` key, merge carefully to preserve existing hooks.
 
-### Step 4: Verify MCP server
+### Step 4: Verify Yocore is running
 
-Check if the MCP server is accessible at common paths:
-- `/Applications/yolog.app/Contents/MacOS/yolog-mcp-server` (macOS app)
-- `$HOME/.local/bin/yolog-mcp-server` (manual install)
+Check if the Yocore HTTP API is accessible:
 
 ```bash
-# Test the server responds
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | /Applications/yolog.app/Contents/MacOS/yolog-mcp-server 2>/dev/null | head -c 100
+curl -s --max-time 2 http://127.0.0.1:19420/health
 ```
+
+If this fails, the user needs to start the Yolog desktop app (which launches Yocore).
 
 ### Step 5: Add memory protocol to CLAUDE.md
 
@@ -102,7 +101,7 @@ This project uses Yolog for persistent memory across sessions.
 ### Step 6: Display success message
 
 ```
-✅ Yolog hooks configured successfully!
+Yolog hooks configured successfully!
 
 Hooks installed:
   - .claude/hooks/session-start.sh (captures session ID, auto-restores context after compaction)
@@ -118,17 +117,17 @@ Next steps:
   1. Restart Claude Code to activate hooks
   2. Use /yo context to verify session ID is captured
 
-MCP Server: [path or "Not found - install Yolog app"]
+Yocore API: [http://127.0.0.1:19420 or "Not reachable - start Yolog desktop app"]
 ```
 
 ## Error Handling
 
 - If `.claude/settings.local.json` has invalid JSON, back it up and create fresh
 - If hooks already exist, ask user before overwriting
-- If MCP server not found, warn but continue (hooks will work, MCP tools won't)
+- If Yocore is not reachable, warn but continue (hooks will work once Yocore starts)
 
 ## Notes
 
 - `<SKILL_DIRECTORY>` is the directory containing this skill (where SKILL.md is located)
-- The hooks require `jq` to be installed for JSON parsing
+- The hooks require `jq` and `curl` to be installed
 - After init, user must restart Claude Code for hooks to take effect

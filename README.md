@@ -68,14 +68,15 @@ Then run `/yo init` to set up hooks for automatic session tracking.
    cp -r yoskill/skills/yo/hooks /path/to/your/project/.claude/
    ```
 
-### Configure MCP CLI Path
+### Verify Yocore is Running
 
-After installation, configure the MCP CLI path:
+After installation, ensure the Yocore HTTP API is accessible:
 
-1. Open Yolog Desktop > Settings > Memory & Skills
-2. Copy the "MCP CLI Path"
-3. Open `.claude/skills/yo/SKILL.md`
-4. Replace the path in the Configuration section
+```bash
+curl -s http://127.0.0.1:19420/health
+```
+
+If this fails, start the Yolog desktop app (which launches Yocore automatically).
 
 ### Start Using
 
@@ -105,17 +106,18 @@ Search memories by tags for targeted results:
 
 ## How it Works
 
-The skills invoke the Yolog MCP server CLI to search your local memory database. All data stays on your machine - nothing is sent to external servers.
+The skills call the Yocore HTTP API (`localhost:19420`) to search your local memory database. All data stays on your machine - nothing is sent to external servers.
 
 ```
-Claude Code → Skill → MCP CLI → Local SQLite DB → Memories
+Claude Code → Skill → curl → Yocore HTTP API → Local SQLite DB → Memories
 ```
 
 ## Requirements
 
-- Yolog Desktop (release build with MCP server)
+- Yolog Desktop (which runs Yocore as a local HTTP server)
 - Claude Code
 - Sessions with memory extraction completed
+- `curl` and `jq` installed (typically available by default)
 
 ## License
 

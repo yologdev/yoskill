@@ -22,11 +22,14 @@ Access project memories and session context from the Yolog desktop app.
 
 ## Configuration
 
-MCP CLI path (copy from Yolog Settings > Memory & Skills):
+Yocore HTTP API URL (Yocore runs as a local HTTP server):
 
 ```
-MCP_CLI_PATH=/Applications/yolog.app/Contents/MacOS/yolog-mcp-server
+YOCORE_URL=http://127.0.0.1:19420
 ```
+
+If the environment variable `YOCORE_URL` is set, use that value.
+Otherwise, default to `http://127.0.0.1:19420`.
 
 ## Commands
 
