@@ -59,14 +59,14 @@ This project uses Yolog for persistent memory across coding sessions. Hooks hand
 
 ### Step 3: Add auto-approve permissions
 
-Merge the following into `.claude/settings.local.json` permissions allow list (create if needed):
+Merge the following into the user's `~/.claude/settings.json` permissions allow list (create the `permissions.allow` array if needed):
 
 ```json
 "Skill(yo)",
 "Bash(curl:*)"
 ```
 
-This allows `/yo` commands to run without manual approval each time.
+This allows `/yo` commands to run without manual approval. User-level settings are required because the plugin is installed at user scope.
 
 ### Step 4: Display success message
 
@@ -77,10 +77,10 @@ CLAUDE.md updated:
   - Added Yolog Memory Protocol section
 
 Settings updated:
-  - .claude/settings.local.json (auto-approve permissions)
+  - ~/.claude/settings.json (auto-approve permissions)
 
 Next steps:
-  1. Restart Claude Code to activate hooks
+  1. Restart Claude Code to activate
   2. Use /yo context to verify session ID is captured
 
 Yocore API: [http://127.0.0.1:19420 or "Not reachable - start Yolog desktop app"]
@@ -88,7 +88,7 @@ Yocore API: [http://127.0.0.1:19420 or "Not reachable - start Yolog desktop app"
 
 ## Error Handling
 
-- If `.claude/settings.local.json` has invalid JSON, back it up and create fresh
+- If `~/.claude/settings.json` has invalid JSON, back it up and create fresh
 - If Yocore is not reachable, warn but continue (hooks will work once Yocore starts)
 
 ## Notes
