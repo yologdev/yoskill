@@ -1,6 +1,6 @@
-# Yolog Skills for Claude Code
+# Yolog Skills
 
-Recall project memories during coding sessions. Give Claude Code access to decisions, facts, preferences, and context extracted from your past coding sessions.
+Recall project memories during coding sessions. Give your AI coding tools access to decisions, facts, preferences, and context extracted from your past coding sessions.
 
 ## What is this?
 
@@ -11,7 +11,7 @@ Recall project memories during coding sessions. Give Claude Code access to decis
 - **Context** - Background information for tasks
 - **Tasks** - Work in progress and completed items
 
-These skills let you quickly recall this knowledge in Claude Code using simple commands.
+Works with **Claude Code**, **OpenClaw**, **Cursor**, **Windsurf**, **GitHub Copilot**, and **Cline**.
 
 ## Available Skills
 
@@ -39,6 +39,7 @@ These skills let you quickly recall this knowledge in Claude Code using simple c
 /yo project-search "config migration"
 /yo memories
 /yo project
+/yo init cursor
 ```
 
 **Note:** After context compaction, session context is **automatically restored** - no manual `/yo context` needed.
@@ -159,13 +160,20 @@ Search memories by tags for targeted results:
 The skills call the Yocore HTTP API (`localhost:19420`) to search your local memory database. All data stays on your machine - nothing is sent to external servers.
 
 ```
-Claude Code → Skill → curl → Yocore HTTP API → Local SQLite DB → Memories
+LLM Tool → curl → Yocore HTTP API → Local SQLite DB → Memories
 ```
+
+## Other LLM Tools
+
+For non-Claude-Code tools, `/yo init` auto-detects installed clients and injects the memory snippet. You can also configure manually:
+
+- **[API-REFERENCE.md](API-REFERENCE.md)** — Full Yocore HTTP API docs (all endpoints, request/response formats)
+- **[LLM-PROMPT-SNIPPET.md](LLM-PROMPT-SNIPPET.md)** — Copy-pasteable system prompt snippet for `.cursorrules`, `.windsurfrules`, `.clinerules`, `.github/copilot-instructions.md`, or OpenClaw's `USER.md`
 
 ## Requirements
 
-- Yocore (local HTTP server)
-- Claude Code
+- [Yocore](https://yolog.dev) (local HTTP server)
+- An LLM coding tool (Claude Code, OpenClaw, Cursor, Windsurf, Copilot, or Cline)
 - Sessions with memory extraction completed
 - `curl` and `jq` installed (typically available by default)
 
