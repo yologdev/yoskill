@@ -3,6 +3,10 @@
 # Captures Claude Code session_id and makes it available to subsequent commands
 # For compacted sessions: proactively injects session context into Claude's context
 
+# Check dependencies
+command -v jq >/dev/null 2>&1 || { echo "[yolog] Error: jq is required but not found" >&2; exit 0; }
+command -v curl >/dev/null 2>&1 || { echo "[yolog] Error: curl is required but not found" >&2; exit 0; }
+
 # Read hook input (JSON from stdin)
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // ""')
@@ -32,17 +36,16 @@ if [ "$SOURCE" = "compact" ] && [ -n "$CWD" ]; then
         exit 0
     fi
 
-    # Build auth header if API key is set
-    AUTH_HEADER=""
+    # Build curl args (avoid eval for safety)
+    CURL_ARGS=(-s --max-time 5 -X POST "${YOCORE_URL}/api/context/session"
+      -H "Content-Type: application/json")
     if [ -n "${YOCORE_API_KEY:-}" ]; then
-        AUTH_HEADER="-H \"Authorization: Bearer ${YOCORE_API_KEY}\""
+        CURL_ARGS+=(-H "Authorization: Bearer ${YOCORE_API_KEY}")
     fi
+    CURL_ARGS+=(-d "{\"session_id\":\"$SESSION_ID\",\"project_path\":\"$CWD\"}")
 
     # Get session context via HTTP API
-    RESPONSE=$(eval curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/session" \
-      -H "Content-Type: application/json" \
-      $AUTH_HEADER \
-      -d "{\"session_id\":\"$SESSION_ID\",\"project_path\":\"$CWD\"}" 2>/dev/null)
+    RESPONSE=$(curl "${CURL_ARGS[@]}" 2>/dev/null)
     CONTEXT=$(echo "$RESPONSE" | jq -r '.formatted_text // empty' 2>/dev/null)
 
     if [ -n "$CONTEXT" ]; then

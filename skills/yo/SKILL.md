@@ -1,6 +1,6 @@
 ---
 name: yo
-description: "Yolog Memory System - USE PROACTIVELY. MUST search before: answering 'what did we decide/do?', implementing features, debugging familiar issues, answering 'why did we...'. Commands: /yo context (session start), /yo memory-search <query> (decisions/patterns), /yo project-search <query> (past conversations)"
+description: "Yolog Memory System - USE PROACTIVELY. MUST search before: answering 'what did we decide/do?', implementing features, debugging familiar issues, answering 'why did we...'. Commands: /yo context (session start), /yo memory-search <query> (decisions/patterns), /yo project-search <query> (past conversations). Do NOT use for general knowledge questions, code generation unrelated to past sessions, or file operations."
 ---
 
 # Yolog Memory System
@@ -9,6 +9,8 @@ Access project memories, session context, and raw conversation search from Yocor
 
 ## When to Use (PROACTIVE — do NOT wait for user to ask)
 
+### Always trigger
+
 | Trigger | Command |
 |---------|---------|
 | Session start (fresh) | `/yo context` |
@@ -16,10 +18,15 @@ Access project memories, session context, and raw conversation search from Yocor
 | User asks about past decisions or patterns | `/yo memory-search <keywords>` |
 | User asks "why did we..." / "what was the reason for..." | `/yo memory-search <topic>` |
 | User says "I don't remember" / "what was..." | `/yo memory-search <topic>` |
-| Before implementing a feature | `/yo memory-search <feature topic>` |
-| User is debugging something | `/yo memory-search <error or topic>` |
 | User asks "how did we do X before?" | `/yo project-search <X>` |
 | User asks "when did we discuss X?" / "find the conversation about X" | `/yo project-search <X>` |
+
+### Consider triggering (when context may help)
+
+| Trigger | Command |
+|---------|---------|
+| Before implementing a feature | `/yo memory-search <feature topic>` |
+| User is debugging something | `/yo memory-search <error or topic>` |
 | Before working in unfamiliar area of codebase | `/yo project` |
 | Wrapping up or ending session | `/yo context` to verify captured |
 
@@ -27,28 +34,11 @@ Access project memories, session context, and raw conversation search from Yocor
 
 **Note:** After compaction, context is **automatically injected** by the SessionStart hook - no manual `/yo context` needed.
 
-## Configuration & URL Resolution
+## Conventions
 
-**IMPORTANT: Never use shell variable expansion (like `${VAR:-default}`) in curl commands.** Claude Code's permission system cannot match commands containing shell variable expansion. Always substitute literal values.
-
-Before running any curl command:
-1. Check if `YOCORE_URL` env var is set. If yes, use that value. If not, use `http://127.0.0.1:19420`
-2. Check if `YOCORE_API_KEY` env var is set. If yes, add `-H "Authorization: Bearer <key>"` to curl. If not, omit the header (local Yocore does not require auth)
-3. Use the resolved literal URL and auth header directly in curl commands
-
-In the command docs below, `<YOCORE_URL>` means the resolved URL and `<AUTH_HEADER>` means the auth header (or nothing if no API key).
-
-## Project ID Resolution
-
-Some commands need the project UUID. Resolve it from the current working directory:
-
-```bash
-curl -s <YOCORE_URL>/api/projects/resolve?path=<CWD> <AUTH_HEADER>
-```
-
-Returns `{ "id": "uuid", "name": "project-name", "folder_path": "..." }` or 404.
-
-Use the `id` field as `<PROJECT_ID>` in subsequent API calls.
+- **Memory IDs**: Always display memory IDs (e.g., `[#42]`) in output — they enable `/yo update` and `/yo delete`
+- **Read vs write**: Search/context commands are proactive. Write commands (`update`, `delete`) are NEVER proactive — only when user explicitly asks
+- **URL/Auth resolution**: Each command file contains its own resolution instructions. Never use shell variable expansion in curl commands
 
 ## Commands
 

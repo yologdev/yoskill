@@ -10,7 +10,9 @@ Get project-level context shared across all sessions. Includes key decisions, pa
 
 ## Instructions
 
-1. Call the Yocore HTTP API with current working directory (use resolved `<YOCORE_URL>` and `<AUTH_HEADER>`, see SKILL.md):
+> **URL/Auth:** `<YOCORE_URL>` = `YOCORE_URL` env var or `http://127.0.0.1:19420`. `<AUTH_HEADER>` = `-H "Authorization: Bearer <key>"` if `YOCORE_API_KEY` is set, otherwise omit. Never use shell variable expansion — substitute literal values.
+
+1. Call the Yocore HTTP API with current working directory:
 ```bash
 curl -s <YOCORE_URL>/api/context/project?project_path=<CWD> <AUTH_HEADER>
 ```
@@ -48,6 +50,5 @@ curl -s <YOCORE_URL>/api/context/project?project_path=<CWD> <AUTH_HEADER>
 ## Notes
 
 - Replace `<CWD>` with the current working directory
-- **Always include memory IDs** (e.g., `[#42]`) — enables `/yo update` and `/yo delete`
 - This returns project-wide knowledge, not session-specific state
 - Use `/yo context` for session-specific state (active task, recent decisions)

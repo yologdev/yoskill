@@ -10,7 +10,9 @@ List available memory tags for the current project.
 
 ## Instructions
 
-1. Resolve the project ID (use resolved `<YOCORE_URL>` and `<AUTH_HEADER>`, see SKILL.md):
+> **URL/Auth:** `<YOCORE_URL>` = `YOCORE_URL` env var or `http://127.0.0.1:19420`. `<AUTH_HEADER>` = `-H "Authorization: Bearer <key>"` if `YOCORE_API_KEY` is set, otherwise omit. Never use shell variable expansion — substitute literal values.
+
+1. Resolve the project ID:
 ```bash
 curl -s <YOCORE_URL>/api/projects/resolve?path=<CWD> <AUTH_HEADER>
 ```

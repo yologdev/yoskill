@@ -11,7 +11,7 @@ Yoskill is a Claude Code plugin that gives Claude access to persistent memories 
 This is a pure skill/plugin repo with no build system, tests, or compiled code.
 
 - **`skills/yo/`** — The `/yo` skill for Claude Code
-  - `SKILL.md` — Skill entrypoint and router. Parses `$ARGUMENTS` and dispatches to the appropriate command file. Contains the frontmatter (`name`, `description`), proactive-use triggers table, URL/auth resolution rules, and project ID resolution.
+  - `SKILL.md` — Skill entrypoint and router. Parses `$ARGUMENTS` and dispatches to the appropriate command file. Contains the frontmatter (`name`, `description`), tiered proactive-use triggers, and conventions.
   - One `.md` file per subcommand: `CONTEXT.md`, `SEARCH.md`, `PROJECT.md`, `PROJECT-SEARCH.md`, `MEMORIES.md`, `UPDATE.md`, `DELETE.md`, `TAGS.md`, `STATUS.md`, `INIT.md`
 - **`hooks/`** — Claude Code lifecycle hooks
   - `hooks.json` — Hook registration (uses `${CLAUDE_PLUGIN_ROOT}` for path resolution)
@@ -25,7 +25,11 @@ User runs /yo <command> → SKILL.md routes by $ARGUMENTS → <COMMAND>.md instr
 → Claude executes curl commands → Yocore HTTP API (localhost:19420) → Local SQLite DB
 ```
 
-Each command `.md` file is a self-contained instruction set telling Claude what curl commands to run and how to format the response. The skill has no executable code of its own — it's entirely prompt-driven.
+Each command `.md` file is a self-contained instruction set telling Claude what curl commands to run and how to format the response — including its own URL/auth resolution block. The skill has no executable code of its own — it's entirely prompt-driven.
+
+**Portability files** (repo root):
+- `API-REFERENCE.md` — Tool-agnostic Yocore HTTP API docs for any integration
+- `LLM-PROMPT-SNIPPET.md` — Copy-pasteable system prompt snippet for non-Claude-Code LLM tools (Cursor, Windsurf, Copilot, etc.)
 
 **Hook lifecycle:**
 1. `SessionStart` hook captures `session_id` into `CLAUDE_ENV_FILE` so subsequent `/yo` commands can use it

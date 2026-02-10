@@ -3,6 +3,10 @@
 # Saves session state before context compaction
 # This ensures current work context survives memory compression
 
+# Check dependencies
+command -v jq >/dev/null 2>&1 || { echo "[yolog] Error: jq is required but not found" >&2; exit 0; }
+command -v curl >/dev/null 2>&1 || { echo "[yolog] Error: curl is required but not found" >&2; exit 0; }
+
 # Read hook input (JSON from stdin)
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // ""')
@@ -28,17 +32,20 @@ if ! curl -s --max-time 2 "${YOCORE_URL}/health" >/dev/null 2>&1; then
     exit 0
 fi
 
-# Build auth header if API key is set
-AUTH_HEADER=""
+# Build curl args (avoid eval for safety)
+CURL_ARGS=(-s --max-time 5 -X POST "${YOCORE_URL}/api/context/lifeboat"
+  -H "Content-Type: application/json")
 if [ -n "${YOCORE_API_KEY:-}" ]; then
-    AUTH_HEADER="-H \"Authorization: Bearer ${YOCORE_API_KEY}\""
+    CURL_ARGS+=(-H "Authorization: Bearer ${YOCORE_API_KEY}")
 fi
+CURL_ARGS+=(-d "{\"session_id\":\"$SESSION_ID\"}")
 
-# Save lifeboat via HTTP API
-eval curl -s --max-time 5 -X POST "${YOCORE_URL}/api/context/lifeboat" \
-  -H "Content-Type: application/json" \
-  $AUTH_HEADER \
-  -d "{\"session_id\":\"$SESSION_ID\"}" >/dev/null 2>&1
-echo "[yolog] Lifeboat saved successfully" >&2
+# Save lifeboat via HTTP API and verify response
+HTTP_STATUS=$(curl -o /dev/null -w "%{http_code}" "${CURL_ARGS[@]}" 2>/dev/null)
+if [ "${HTTP_STATUS:0:1}" = "2" ]; then
+    echo "[yolog] Lifeboat saved successfully" >&2
+else
+    echo "[yolog] Warning: Lifeboat save failed (HTTP $HTTP_STATUS)" >&2
+fi
 
 exit 0

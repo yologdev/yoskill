@@ -10,7 +10,9 @@ Check if Yocore is running and accessible.
 
 ## Instructions
 
-1. Call the Yocore health endpoint (use resolved `<YOCORE_URL>`, see SKILL.md):
+> **URL/Auth:** `<YOCORE_URL>` = `YOCORE_URL` env var or `http://127.0.0.1:19420`. Never use shell variable expansion — substitute literal values.
+
+1. Call the Yocore health endpoint:
 ```bash
 curl -s --max-time 3 <YOCORE_URL>/health
 ```

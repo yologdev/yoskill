@@ -10,6 +10,8 @@ Get session context including current task state, decisions, and relevant memori
 
 ## Instructions
 
+> **URL/Auth:** `<YOCORE_URL>` = `YOCORE_URL` env var or `http://127.0.0.1:19420`. `<AUTH_HEADER>` = `-H "Authorization: Bearer <key>"` if `YOCORE_API_KEY` is set, otherwise omit. Never use shell variable expansion — substitute literal values.
+
 1. Get `YOLOG_SESSION_ID` from environment (set by SessionStart hook)
 
 2. If `YOLOG_SESSION_ID` is not set, inform the user:
@@ -18,7 +20,7 @@ Session ID not available. Use `/yo project` for project-wide context,
 or ensure the SessionStart hook is configured.
 ```
 
-3. If `YOLOG_SESSION_ID` is set, call the Yocore HTTP API (use resolved `<YOCORE_URL>` and `<AUTH_HEADER>`, see SKILL.md):
+3. If `YOLOG_SESSION_ID` is set, call the Yocore HTTP API:
 ```bash
 curl -s -X POST <YOCORE_URL>/api/context/session \
   -H "Content-Type: application/json" \
@@ -56,5 +58,4 @@ curl -s -X POST <YOCORE_URL>/api/context/session \
 
 - Replace `<CWD>` with the current working directory
 - Replace `<SESSION_ID>` with YOLOG_SESSION_ID from environment
-- **Always include memory IDs** (e.g., `[#42]`) — enables `/yo update` and `/yo delete`
 - **After compaction:** Context is automatically injected by SessionStart hook (no manual call needed)
