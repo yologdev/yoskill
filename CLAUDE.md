@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Yoskill is a Claude Code plugin that gives Claude access to persistent memories from [Yocore](https://yolog.dev). It provides the `/yo` skill with subcommands for recalling decisions, facts, preferences, and session context extracted from past coding sessions. All data stays local — the skill calls the Yocore HTTP API at `localhost:19420`.
+Yoskill gives AI coding tools access to persistent memories from [Yocore](https://yolog.dev). It provides the `/yo` skill (Claude Code) and portable prompt snippets (Cursor, Windsurf, OpenClaw, Copilot, Cline) for recalling decisions, facts, preferences, and session context extracted from past coding sessions. All data stays local — everything calls the Yocore HTTP API at `localhost:19420`.
 
 ## Repository Structure
 
@@ -12,7 +12,8 @@ This is a pure skill/plugin repo with no build system, tests, or compiled code.
 
 - **`skills/yo/`** — The `/yo` skill for Claude Code
   - `SKILL.md` — Skill entrypoint and router. Parses `$ARGUMENTS` and dispatches to the appropriate command file. Contains the frontmatter (`name`, `description`), tiered proactive-use triggers, and conventions.
-  - One `.md` file per subcommand: `CONTEXT.md`, `SEARCH.md`, `PROJECT.md`, `PROJECT-SEARCH.md`, `MEMORIES.md`, `UPDATE.md`, `DELETE.md`, `TAGS.md`, `STATUS.md`, `INIT.md`
+  - One `.md` file per subcommand: `CONTEXT.md`, `SEARCH.md`, `PROJECT.md`, `PROJECT-SEARCH.md`, `MEMORIES.md`, `UPDATE.md`, `DELETE.md`, `TAGS.md`, `STATUS.md`
+  - `INIT.md` — Multi-client setup. Auto-detects installed LLM clients and injects the appropriate snippet. Supports: `claude`, `openclaw`, `cursor`, `windsurf`, `copilot`, `cline`
 - **`hooks/`** — Claude Code lifecycle hooks
   - `hooks.json` — Hook registration (uses `${CLAUDE_PLUGIN_ROOT}` for path resolution)
   - `session-start.sh` — Sets `YOLOG_SESSION_ID` env var; on compaction, auto-injects session context via stdout
@@ -29,7 +30,7 @@ Each command `.md` file is a self-contained instruction set telling Claude what 
 
 **Portability files** (repo root):
 - `API-REFERENCE.md` — Tool-agnostic Yocore HTTP API docs for any integration
-- `LLM-PROMPT-SNIPPET.md` — Copy-pasteable system prompt snippet for non-Claude-Code LLM tools (Cursor, Windsurf, Copilot, etc.)
+- `LLM-PROMPT-SNIPPET.md` — Copy-pasteable system prompt snippet for non-Claude-Code LLM tools (OpenClaw, Cursor, Windsurf, Copilot, Cline)
 
 **Hook lifecycle:**
 1. `SessionStart` hook captures `session_id` into `CLAUDE_ENV_FILE` so subsequent `/yo` commands can use it
